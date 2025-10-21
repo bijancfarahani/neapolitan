@@ -10,7 +10,7 @@ TEST_CASE ("one is equal to one", "[dummy]")
 
 TEST_CASE ("Plugin instance", "[instance]")
 {
-    PluginProcessor testPlugin;
+    NeapolitanAudioProcessor testPlugin;
 
     SECTION ("name")
     {
@@ -18,7 +18,6 @@ TEST_CASE ("Plugin instance", "[instance]")
             Catch::Matchers::Equals ("Pamplejuce Demo"));
     }
 }
-
 
 #ifdef PAMPLEJUCE_IPP
     #include <ipp.h>
