@@ -9,6 +9,14 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+// This creates new instances of the plugin.
+// JUCE expects to find it within the global namespace.
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return new neapolitan::NeapolitanAudioProcessor();
+}
+
+namespace neapolitan {
 //==============================================================================
 NeapolitanAudioProcessor::NeapolitanAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -184,8 +192,6 @@ void NeapolitanAudioProcessor::setStateInformation (const void* data, int sizeIn
 }
 
 //==============================================================================
-// This creates new instances of the plugin..
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
-    return new NeapolitanAudioProcessor();
+
+
 }
