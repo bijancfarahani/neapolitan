@@ -1,5 +1,7 @@
 #include "PluginEditor.h"
 
+#include "GuiConfig.h"
+
 namespace neapolitan
 {
 NeapolitanAudioProcessorEditor::NeapolitanAudioProcessorEditor (NeapolitanAudioProcessor& p)
@@ -22,7 +24,7 @@ NeapolitanAudioProcessorEditor::NeapolitanAudioProcessorEditor (NeapolitanAudioP
 
    // Make sure that before the constructor has finished, you've set the
    // editor's size to whatever you need it to be.
-   setSize (400, 300);
+   setSize (gui::DEFAULT_WINDOW_WIDTH, gui::DEFAULT_WINDOW_HEIGHT);
 }
 
 NeapolitanAudioProcessorEditor::~NeapolitanAudioProcessorEditor() = default;
@@ -30,11 +32,11 @@ NeapolitanAudioProcessorEditor::~NeapolitanAudioProcessorEditor() = default;
 void NeapolitanAudioProcessorEditor::paint (juce::Graphics& g)
 {
    // (Our component is opaque, so we must completely fill the background with a solid colour)
-   g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+   g.fillAll (juce::Colours::lightpink);
 
    auto area = getLocalBounds();
    g.setColour (juce::Colours::white);
-   g.setFont (16.0f);
+   g.setFont (36.0f);
    auto helloWorld = juce::String ("Hello from ") + PRODUCT_NAME_WITHOUT_VERSION + " v" VERSION + " running in " + CMAKE_BUILD_TYPE;
    g.drawText (helloWorld, area.removeFromTop (150), juce::Justification::centred, false);
 }
