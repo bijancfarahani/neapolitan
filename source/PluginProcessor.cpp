@@ -13,76 +13,77 @@
 // JUCE expects to find it within the global namespace.
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new neapolitan::NeapolitanAudioProcessor();
+   return new neapolitan::NeapolitanAudioProcessor();
 }
 
-namespace neapolitan {
+namespace neapolitan
+{
 //==============================================================================
 NeapolitanAudioProcessor::NeapolitanAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
     : AudioProcessor (BusesProperties()
-    #if !JucePlugin_IsMidiEffect
-        #if !JucePlugin_IsSynth
+   #if !JucePlugin_IsMidiEffect
+      #if !JucePlugin_IsSynth
               .withInput ("Input", juce::AudioChannelSet::stereo(), true)
-        #endif
+      #endif
               .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-    #endif
-      )
+   #endif
+              )
 #endif
+      ,
+      apvts (*this, nullptr, "PARAMS", { std::make_unique<juce::AudioParameterFloat> ("gain", "Gain", 0.0f, 1.0f, 0.5f) })
 {
 }
 
-NeapolitanAudioProcessor::~NeapolitanAudioProcessor()
-{
-}
+NeapolitanAudioProcessor::~NeapolitanAudioProcessor() = default;
 
 //==============================================================================
 const juce::String NeapolitanAudioProcessor::getName() const
 {
-    return JucePlugin_Name;
+   return JucePlugin_Name;
 }
 
 bool NeapolitanAudioProcessor::acceptsMidi() const
 {
 #if JucePlugin_WantsMidiInput
-    return true;
+   return true;
 #else
-    return false;
+   return false;
 #endif
 }
 
 bool NeapolitanAudioProcessor::producesMidi() const
 {
 #if JucePlugin_ProducesMidiOutput
-    return true;
+   return true;
 #else
-    return false;
+   return false;
 #endif
 }
 
 bool NeapolitanAudioProcessor::isMidiEffect() const
 {
 #if JucePlugin_IsMidiEffect
-    return true;
+   return true;
 #else
-    return false;
+   return false;
 #endif
 }
 
 double NeapolitanAudioProcessor::getTailLengthSeconds() const
 {
-    return 0.0;
+   return 0.0;
 }
 
 int NeapolitanAudioProcessor::getNumPrograms()
 {
-    return 1; // NB: some hosts don't cope very well if you tell them there are 0 programs,
-    // so this should be at least 1, even if you're not really implementing programs.
+   return 1; // NB: some hosts don't cope very well if you tell them there are 0 programs,
+   // so this should be at least 1, even if you're not really implementing programs.
 }
 
 int NeapolitanAudioProcessor::getCurrentProgram()
 {
-    return 0;
+   return 0;
 }
 
 void NeapolitanAudioProcessor::setCurrentProgram (int index)
@@ -91,7 +92,7 @@ void NeapolitanAudioProcessor::setCurrentProgram (int index)
 
 const juce::String NeapolitanAudioProcessor::getProgramName (int index)
 {
-    return {};
+   return {};
 }
 
 void NeapolitanAudioProcessor::changeProgramName (int index, const juce::String& newName)
@@ -101,97 +102,105 @@ void NeapolitanAudioProcessor::changeProgramName (int index, const juce::String&
 //==============================================================================
 void NeapolitanAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+   // Use this method as the place to do any pre-playback
+   // initialisation that you need..
 }
 
 void NeapolitanAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+   // When playback stops, you can use this as an opportunity to free up any
+   // spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool NeapolitanAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-    #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
-    return true;
-    #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    // Some plugin hosts, such as certain GarageBand versions, will only
-    // load plugins that support stereo bus layouts.
-    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-        && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
-        return false;
+   #if JucePlugin_IsMidiEffect
+   juce::ignoreUnused (layouts);
+   return true;
+   #else
+   // This is the place where you check if the layout is supported.
+   // In this template code we only support mono or stereo.
+   // Some plugin hosts, such as certain GarageBand versions, will only
+   // load plugins that support stereo bus layouts.
+   if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
+       && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+      return false;
 
-        // This checks if the input layout matches the output layout
-        #if !JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
-        return false;
-        #endif
+      // This checks if the input layout matches the output layout
+      #if !JucePlugin_IsSynth
+   if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
+      return false;
+      #endif
 
-    return true;
-    #endif
+   return true;
+   #endif
 }
 #endif
 
 void NeapolitanAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
+   juce::ScopedNoDenormals noDenormals;
+   auto totalNumInputChannels = getTotalNumInputChannels();
+   auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+   // In case we have more outputs than inputs, this code clears any output
+   // channels that didn't contain input data, (because these aren't
+   // guaranteed to be empty - they may contain garbage).
+   // This is here to avoid people getting screaming feedback
+   // when they first compile a plugin, but obviously you don't need to keep
+   // this code if your algorithm always overwrites all the output channels.
+   for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+      buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
+   // This is the place where you'd normally do the guts of your plugin's
+   // audio processing...
+   // Make sure to reset the state if your inner loop is processing
+   // the samples and the outer loop is handling the channels.
+   // Alternatively, you can process the samples with the channels
+   // interleaved by keeping the same state.
+   for (int channel = 0; channel < totalNumInputChannels; ++channel)
+   {
+      auto* channelData = buffer.getWritePointer (channel);
 
-        // ..do something to the data...
-    }
+      // ..do something to the data...
+   }
 }
 
 //==============================================================================
 bool NeapolitanAudioProcessor::hasEditor() const
 {
-    return true; // (change this to false if you choose to not supply an editor)
+   return true; // (change this to false if you choose to not supply an editor)
 }
 
 juce::AudioProcessorEditor* NeapolitanAudioProcessor::createEditor()
 {
-    return new NeapolitanAudioProcessorEditor (*this);
+   return new NeapolitanAudioProcessorEditor (*this);
 }
 
 //==============================================================================
 void NeapolitanAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+   // You should use this method to store your parameters in the memory block.
+   // You could do that either as raw data, or use the XML or ValueTree classes
+   // as intermediaries to make it easy to save and load complex data.
 }
 
 void NeapolitanAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+   // You should use this method to restore your parameters from this memory block,
+   // whose contents will have been created by the getStateInformation() call.
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout
+    NeapolitanAudioProcessor::createParameterLayout()
+{
+   std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+   params.push_back (std::make_unique<juce::AudioParameterFloat> (
+       "gain", "Gain", 0.0f, 1.0f, 0.5f));
+   return { params.begin(), params.end() };
 }
 
 //==============================================================================
-
 
 }

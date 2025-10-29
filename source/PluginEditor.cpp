@@ -1,11 +1,14 @@
 #include "PluginEditor.h"
 
 #include "GuiConfig.h"
+//#include <juce_animation/animation/juce_Easings.h>
+//#include <juce_animation/animation/juce_ValueAnimatorBuilder.h>
+#include <juce_animation/juce_animation.h>
 
 namespace neapolitan
 {
 NeapolitanAudioProcessorEditor::NeapolitanAudioProcessorEditor (NeapolitanAudioProcessor& p)
-    : AudioProcessorEditor (&p), processorRef (p)
+    : AudioProcessorEditor (&p), processorRef (p), visualizer (10, 10, 40, 40)
 {
    juce::ignoreUnused (processorRef);
 
@@ -25,6 +28,41 @@ NeapolitanAudioProcessorEditor::NeapolitanAudioProcessorEditor (NeapolitanAudioP
    // Make sure that before the constructor has finished, you've set the
    // editor's size to whatever you need it to be.
    setSize (gui::DEFAULT_WINDOW_WIDTH, gui::DEFAULT_WINDOW_HEIGHT);
+
+   // --- Gain Slider ---
+   gainSlider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
+   gainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 50, 20);
+   gainSlider.setColour (juce::Slider::thumbColourId, juce::Colours::mediumseagreen);
+   gainSlider.setColour (juce::Slider::rotarySliderFillColourId, juce::Colours::seagreen);
+   // BIJAN: How to move it in GUI?
+   gainLabel.setText ("TESTING", juce::dontSendNotification);
+   gainLabel.setJustificationType (juce::Justification::centred);
+   gainLabel.setColour (juce::Label::textColourId, juce::Colours::white);
+   gainSlider.setBounds (400, 400, 400, 400);
+
+   addAndMakeVisible (gainSlider);
+   addAndMakeVisible (gainLabel);
+
+   // === Attach to processor parameter ===
+   gainAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (
+       processorRef.apvts, "gain", gainSlider);
+
+   footer.setColour (juce::TextButton::buttonColourId, juce::Colours::limegreen);
+   footer.setButtonText ("Studio B, https://github.com/bijancfarahani/neapolitan");
+   auto area = getLocalBounds();
+
+   int headerFooterHeight = 36;
+   footer.setBounds (area.removeFromBottom (headerFooterHeight));
+   footer.setBounds (area.removeFromBottom (headerFooterHeight));
+   addAndMakeVisible (footer);
+   // visualizer.setBounds (40, 300, 300, 300);
+   int x_start = area.getWidth() * 0.25;
+   int width = area.getWidth() * 0.5;
+   int y_start = area.getHeight() * 0.15;
+   int height = area.getHeight() * 0.55;
+   visualizer.setBounds (x_start, y_start, width, height);
+   // === Start animation refresh (e.g., for meters or visual motion) ===
+   startTimerHz (60);
 }
 
 NeapolitanAudioProcessorEditor::~NeapolitanAudioProcessorEditor() = default;
@@ -39,6 +77,22 @@ void NeapolitanAudioProcessorEditor::paint (juce::Graphics& g)
    g.setFont (36.0f);
    auto helloWorld = juce::String ("Hello from ") + PRODUCT_NAME_WITHOUT_VERSION + " v" VERSION + " running in " + CMAKE_BUILD_TYPE;
    g.drawText (helloWorld, area.removeFromTop (150), juce::Justification::centred, false);
+   g.setColour (juce::Colours::black);
+   g.fillRect (visualizer);
+   g.drawRect (visualizer);
+   // Example: animated pulsing ring (visual hook)
+   const auto bounds = gainSlider.getBounds().toFloat();
+   const float time = static_cast<float> (juce::Time::getMillisecondCounter() % 1000) / 1000.0f;
+   const float pulse = 0.5f + 0.5f * std::sin (juce::MathConstants<float>::twoPi * time);
+
+   g.setColour (juce::Colours::mediumseagreen.withAlpha (0.2f + 0.3f * pulse));
+   g.drawEllipse (bounds.expanded (10.0f), 2.0f);
+}
+
+void NeapolitanAudioProcessorEditor::timerCallback()
+{
+   // Here you can repaint or update animated components
+   repaint();
 }
 
 void NeapolitanAudioProcessorEditor::resized()
@@ -47,5 +101,7 @@ void NeapolitanAudioProcessorEditor::resized()
    auto area = getLocalBounds();
    area.removeFromBottom (50);
    inspectButton.setBounds (getLocalBounds().withSizeKeepingCentre (100, 50));
+   int headerFooterHeight = 36;
+   footer.setBounds (area.removeFromBottom (headerFooterHeight));
 }
 }
