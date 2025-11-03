@@ -7,7 +7,7 @@ namespace neapolitan
 class FlavorKnob : public juce::Component
 {
    public:
-    explicit FlavorKnob (PluginProcessor& p, const juce::StringRef flavorName);
+    explicit FlavorKnob (PluginProcessor& p, juce::StringRef flavorName);
     ~FlavorKnob() override = default;
 
     void paint(juce::Graphics& g) override;
@@ -45,7 +45,11 @@ protected:
             return;
         }
 
-        juce::Colour getBackgroundColor() const override {return juce::Colours::navajowhite;}
+        juce::Colour getBackgroundColor() const override
+        {
+            return juce::Colour::fromRGB(245, 225, 209);
+            return juce::Colours::navajowhite;
+        }
         juce::String getFlavorName() const override {return "Vanilla";}
 
     };
@@ -56,7 +60,11 @@ protected:
         explicit StrawberryKnob (PluginProcessor& p);
         juce::String getFlavorName() const override {return "Strawberry";}
 
-        juce::Colour getBackgroundColor() const override {return juce::Colours::indianred;}
+        juce::Colour getBackgroundColor() const override
+        {
+            return juce::Colour::fromRGB(210, 167, 162);
+            return juce::Colours::indianred;
+        }
     };
 
     class ChocolateKnob final : public FlavorKnob
@@ -65,7 +73,11 @@ protected:
         explicit ChocolateKnob (PluginProcessor& p);
         juce::String getFlavorName() const override {return "Chocolate";}
 
-        juce::Colour getBackgroundColor() const override {return juce::Colours::chocolate;}
+        juce::Colour getBackgroundColor() const override
+        {
+            return juce::Colour::fromRGB(108, 79, 61);
+            return juce::Colours::chocolate;
+        }
     };
 
 } // namespace neapolitan

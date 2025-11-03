@@ -13,11 +13,8 @@ namespace neapolitan{
         gainLabel.setJustificationType(juce::Justification::centred);
         gainLabel.setColour(juce::Label::textColourId, juce::Colours::white);
 
-        auto childBounds = juce::Rectangle<int>(getWidth() * 0.30, getHeight() * 0.20).withCentre(getLocalBounds().getCentre());
-        //gainSlider.setBounds(childBounds);
         gainSlider.setBounds (getWidth() * 0.5, getHeight() * 0.5, 100, 100);
 
-      //  gainSlider.setBounds (200, 120, getWidth() * 0.33, getHeight());
         addAndMakeVisible(gainSlider);
         addAndMakeVisible(gainLabel);
 
@@ -28,12 +25,6 @@ namespace neapolitan{
 
     void FlavorKnob::paint (juce::Graphics& g)
     {
-        /* juce::Colour c1 = juce::Colours::lightgrey;
-        juce::Colour c2 = juce::Colours::darkgrey;
-        float tileSize = 20.0f;
-
-        g.fillCheckerBoard(this->getLocalBounds().toFloat(), tileSize, tileSize, c1, c2);
-*/
         g.setColour (getBackgroundColor());
         g.fillRect (getLocalBounds());
         // Example: animated pulsing ring (visual hook)

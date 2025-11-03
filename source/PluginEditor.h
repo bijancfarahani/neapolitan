@@ -32,9 +32,6 @@ class PluginEditor : public juce::AudioProcessorEditor, private juce::Timer
     juce::TextButton footer;
     juce::Rectangle<int> visualizer;
 
-    juce::Label gainLabel;
-    juce::Slider gainSlider;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };
 } // namespace neapolitan
