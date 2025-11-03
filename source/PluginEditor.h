@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BinaryData.h"
-#include "FlavorKnob.h"
+#include "FlavorPanel.h"
 #include "PluginProcessor.h"
 #include "melatonin_inspector/melatonin_inspector.h"
 namespace neapolitan
@@ -27,7 +27,7 @@ class PluginEditor : public juce::AudioProcessorEditor, private juce::Timer
     juce::TextButton inspectButton{"Inspect the UI"};
 
     // === UI Elements ===
-    FlavorKnob flavorKnobs;
+    FlavorPanel flavorPanel;
 
     juce::TextButton footer;
     juce::Rectangle<int> visualizer;

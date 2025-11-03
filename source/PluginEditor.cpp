@@ -2,7 +2,7 @@
 namespace neapolitan
 {
     PluginEditor::PluginEditor (PluginProcessor& p)
-        : AudioProcessorEditor (&p), processorRef (p), flavorKnobs (p), visualizer (10, 10, 40, 40)
+        : AudioProcessorEditor (&p), processorRef (p), flavorPanel (p), visualizer (10, 10, 40, 40)
     {
         juce::ignoreUnused (processorRef);
 
@@ -34,8 +34,8 @@ namespace neapolitan
         gainLabel.setColour (juce::Label::textColourId, juce::Colours::white);
         gainSlider.setBounds (400, 100, 400, 100);
 
-        addAndMakeVisible (gainSlider);
-        addAndMakeVisible (gainLabel);
+       // addAndMakeVisible (gainSlider);
+       // addAndMakeVisible (gainLabel);
 
         footer.setColour (juce::TextButton::buttonColourId, juce::Colours::limegreen);
         footer.setButtonText ("Studio B, https://github.com/bijancfarahani/neapolitan");
@@ -53,7 +53,11 @@ namespace neapolitan
         // === Start animation refresh (e.g., for meters or visual motion) ===
         startTimerHz (60);
 
-        flavorKnobs.setBounds (800, 100, 800, 100);
+        //flavorPanel.setBounds (getWidth() * 0.5, getHeight() * 0.5, getWidth() * 0.30, getHeight() * 0.25);
+       // flavorPanel.centreWithSize (getWidth(), getHeight());
+        auto childBounds = juce::Rectangle<int>(getWidth() * 0.30, getHeight() * 0.20).withCentre(area.getCentre()).translated(0,getHeight() * 0.30);
+        flavorPanel.setBounds(childBounds);
+        addAndMakeVisible(flavorPanel);
     }
 
     PluginEditor::~PluginEditor()
@@ -73,7 +77,7 @@ namespace neapolitan
         g.setColour (juce::Colours::black);
         //g.fillRect (visualizer);
         //g.drawRect (visualizer);
-        flavorKnobs.paint (g);
+       // flavorPanel.paint (g);
     }
 
     void PluginEditor::resized()
