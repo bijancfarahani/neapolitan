@@ -18,8 +18,12 @@ namespace neapolitan
                   .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
 #endif
                   ),
-          apvts (*this, nullptr, "PARAMS", { std::make_unique<juce::AudioParameterFloat> ("gain", "Gain", 0.0f, 1.0f, 0.5f) })
+          apvts (*this, nullptr, "PARAMS", { std::make_unique<juce::AudioParameterFloat> ("gain_vanilla", "Gain", 0.0f, 1.0f, 0.5f), std::make_unique<juce::AudioParameterFloat> ("gain_strawberry", "Gain", 0.0f, 1.0f, 0.5f), std::make_unique<juce::AudioParameterFloat> ("gain_choc", "Gain", 0.0f, 1.0f, 0.5f) }),
+          _pluginParameters()
     {
+        _pluginParameters[0] = apvts.getParameter (("gain_vanilla"));
+        _pluginParameters[1] = apvts.getParameter (("gain_strawberry"));
+        _pluginParameters[2] = apvts.getParameter (("gain_choc"));
     }
 
     PluginProcessor::~PluginProcessor()
@@ -97,6 +101,12 @@ namespace neapolitan
         // Use this method as the place to do any pre-playback
         // initialisation that you need..
         juce::ignoreUnused (sampleRate, samplesPerBlock);
+
+        juce::String message;
+        message << "Preparing to play audio...\n";
+        message << " samplesPerBlock = " << samplesPerBlock << "\n";
+        message << " sampleRate = " << sampleRate;
+        juce::Logger::getCurrentLogger()->writeToLog (message);
     }
 
     void PluginProcessor::releaseResources()
@@ -151,11 +161,20 @@ namespace neapolitan
         // the samples and the outer loop is handling the channels.
         // Alternatively, you can process the samples with the channels
         // interleaved by keeping the same state.
+        auto level = 0.3f;
+        auto currentLevel = level;
+        auto levelScale = currentLevel * 2.0f;
         for (int channel = 0; channel < totalNumInputChannels; ++channel)
         {
             auto* channelData = buffer.getWritePointer (channel);
             juce::ignoreUnused (channelData);
             // ..do something to the data...
+
+            auto* buf = buffer.getWritePointer (channel);
+            // Fill the required number of samples with noise between -0.125 and +0.125
+            for (auto sample = 0; sample < buffer.getNumSamples(); ++sample)
+                //buf[sample] = random.nextFloat() * 0.25f - 0.125f;
+                buf[sample] = random.nextFloat() * levelScale - currentLevel;
         }
     }
 

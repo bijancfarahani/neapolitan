@@ -11,6 +11,10 @@ namespace neapolitan {
          _knobs.add (std::make_unique<StrawberryKnob> (p));
          _knobs.add (std::make_unique<VanillaKnob> (p));
          _knobs.add (std::make_unique<ChocolateKnob> (p));
+         for (auto* knob : _knobs)
+         {
+             addAndMakeVisible (*knob);
+         }
     }
 
     void FlavorPanel::paint (juce::Graphics& g)
@@ -25,7 +29,6 @@ namespace neapolitan {
          const auto third = area.getWidth() / 3;
          for (auto* knob: _knobs)
          {
-             addAndMakeVisible (knob);
              // Give each knob 1/3 width and some padding.
              knob->setBounds(area.removeFromLeft(third).reduced(10));
          }

@@ -4,27 +4,34 @@
 namespace neapolitan
 {
 
+struct AttachedSlider
+{
+    AttachedSlider(
+        juce::RangedAudioParameter& rangedAudioParameter)
+        : slider(), attachment(rangedAudioParameter, slider, nullptr)
+    {
+        slider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    }
+
+    juce::Slider slider;
+    juce::SliderParameterAttachment attachment;
+};
 class FlavorKnob : public juce::Component
 {
    public:
-    explicit FlavorKnob (PluginProcessor& p, juce::StringRef flavorName);
+    explicit FlavorKnob(PluginProcessor& p, juce::StringRef flavorName, juce::RangedAudioParameter& rangedAudioParameter);
     ~FlavorKnob() override = default;
 
     void paint(juce::Graphics& g) override;
 
-    void resized() override
-    {
-        // Required if you have child components
-        // Set bounds for subcomponents here
-        // gainSlider.setBoundsRelative()
-    }
+    void resized() override;
 
-protected:
+   protected:
     virtual juce::Colour getBackgroundColor() const = 0;
     virtual juce::String getFlavorName() const = 0;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainAttachment;
-    juce::Slider gainSlider;
-
+    // juce::Slider gainSlider;
+    AttachedSlider gainSlider;
 
    private:
     PluginProcessor& _processor;

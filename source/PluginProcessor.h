@@ -41,8 +41,12 @@ class PluginProcessor : public juce::AudioProcessor
 
     // Parameter handling
     juce::AudioProcessorValueTreeState apvts;
+    std::array<juce::RangedAudioParameter*, 1>
+        _pluginParameters;
 
    private:
+    juce::Random random;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
 };
 } // namespace neapolitan
