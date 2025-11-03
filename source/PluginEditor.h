@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BinaryData.h"
+#include "FlavorKnob.h"
 #include "PluginProcessor.h"
 #include "melatonin_inspector/melatonin_inspector.h"
 namespace neapolitan
@@ -26,12 +27,13 @@ class PluginEditor : public juce::AudioProcessorEditor, private juce::Timer
     juce::TextButton inspectButton{"Inspect the UI"};
 
     // === UI Elements ===
-    juce::Slider gainSlider;
-    juce::Label gainLabel;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainAttachment;
+    FlavorKnob flavorKnobs;
 
     juce::TextButton footer;
     juce::Rectangle<int> visualizer;
+
+    juce::Label gainLabel;
+    juce::Slider gainSlider;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };
