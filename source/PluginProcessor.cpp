@@ -18,12 +18,12 @@ namespace neapolitan
                   .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
 #endif
                   ),
-          apvts (*this, nullptr, "PARAMS", { std::make_unique<juce::AudioParameterFloat> ("gain_vanilla", "Gain", 0.0f, 1.0f, 0.5f), std::make_unique<juce::AudioParameterFloat> ("gain_strawberry", "Gain", 0.0f, 1.0f, 0.5f), std::make_unique<juce::AudioParameterFloat> ("gain_choc", "Gain", 0.0f, 1.0f, 0.5f) }),
+          apvts (*this, nullptr, "PARAMS", { std::make_unique<juce::AudioParameterFloat> ("gain_vanilla", "Gain", 0.0f, 1.0f, 0.5f), std::make_unique<juce::AudioParameterFloat> ("gain_strawberry", "Gain", 0.0f, 1.0f, 0.5f), std::make_unique<juce::AudioParameterFloat> ("gain_chocolate", "Gain", 0.0f, 1.0f, 0.5f) }),
           _pluginParameters()
     {
         _pluginParameters[0] = apvts.getParameter (("gain_vanilla"));
         _pluginParameters[1] = apvts.getParameter (("gain_strawberry"));
-        _pluginParameters[2] = apvts.getParameter (("gain_choc"));
+        _pluginParameters[2] = apvts.getParameter (("gain_chocolate"));
     }
 
     PluginProcessor::~PluginProcessor()

@@ -8,13 +8,12 @@ struct AttachedSlider
 {
     AttachedSlider(
         juce::RangedAudioParameter& rangedAudioParameter)
-        : slider(), attachment(rangedAudioParameter, slider, nullptr)
+        : slider()
     {
         slider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     }
 
     juce::Slider slider;
-    juce::SliderParameterAttachment attachment;
 };
 class FlavorKnob : public juce::Component
 {
@@ -30,8 +29,7 @@ class FlavorKnob : public juce::Component
     virtual juce::Colour getBackgroundColor() const = 0;
     virtual juce::String getFlavorName() const = 0;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainAttachment;
-    // juce::Slider gainSlider;
-    AttachedSlider gainSlider;
+    juce::Slider gainSlider;
 
    private:
     PluginProcessor& _processor;
@@ -54,23 +52,21 @@ class FlavorKnob : public juce::Component
 
         juce::Colour getBackgroundColor() const override
         {
-            return juce::Colour::fromRGB(245, 225, 209);
+            return juce::Colour::fromRGB(246, 226, 179);
             return juce::Colours::navajowhite;
         }
-        juce::String getFlavorName() const override {return "Vanilla";}
-
+        juce::String getFlavorName() const override { return "vanilla"; }
     };
 
     class StrawberryKnob final : public FlavorKnob
     {
     public:
         explicit StrawberryKnob (PluginProcessor& p);
-        juce::String getFlavorName() const override {return "Strawberry";}
+        juce::String getFlavorName() const override { return "strawberry"; }
 
         juce::Colour getBackgroundColor() const override
         {
-            return juce::Colour::fromRGB(210, 167, 162);
-            return juce::Colours::indianred;
+            return juce::Colour::fromRGB(253, 174, 174);
         }
     };
 
@@ -78,12 +74,11 @@ class FlavorKnob : public juce::Component
     {
     public:
         explicit ChocolateKnob (PluginProcessor& p);
-        juce::String getFlavorName() const override {return "Chocolate";}
+        juce::String getFlavorName() const override { return "chocolate"; }
 
         juce::Colour getBackgroundColor() const override
         {
-            return juce::Colour::fromRGB(108, 79, 61);
-            return juce::Colours::chocolate;
+            return juce::Colour::fromRGB(126, 102, 81);
         }
     };
 

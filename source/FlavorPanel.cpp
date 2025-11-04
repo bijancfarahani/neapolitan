@@ -8,13 +8,13 @@ namespace neapolitan {
 
      FlavorPanel::FlavorPanel (PluginProcessor& p)
     {
-         _knobs.add (std::make_unique<StrawberryKnob> (p));
-         _knobs.add (std::make_unique<VanillaKnob> (p));
-         _knobs.add (std::make_unique<ChocolateKnob> (p));
-         for (auto* knob : _knobs)
-         {
-             addAndMakeVisible (*knob);
-         }
+        _knobs.add (std::make_unique<VanillaKnob> (p));
+        _knobs.add (std::make_unique<StrawberryKnob> (p));
+        _knobs.add (std::make_unique<ChocolateKnob> (p));
+        for (auto* knob : _knobs)
+        {
+            addAndMakeVisible (*knob);
+        }
     }
 
     void FlavorPanel::paint (juce::Graphics& g)

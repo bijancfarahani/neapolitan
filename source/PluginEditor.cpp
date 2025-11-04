@@ -42,7 +42,7 @@ namespace neapolitan
     void PluginEditor::paint (juce::Graphics& g)
     {
         // (Our component is opaque, so we must completely fill the background with a solid colour)
-        g.fillAll (juce::Colour::fromRGB (238, 195, 100));
+        g.fillAll (juce::Colour::fromRGB (255, 141, 170));
 
         auto area = getLocalBounds();
         g.setColour (juce::Colours::white);
