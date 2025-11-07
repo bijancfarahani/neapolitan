@@ -172,9 +172,9 @@ namespace neapolitan
 
             auto* buf = buffer.getWritePointer (channel);
             // Fill the required number of samples with noise between -0.125 and +0.125
-            for (auto sample = 0; sample < buffer.getNumSamples(); ++sample)
-                //buf[sample] = random.nextFloat() * 0.25f - 0.125f;
-                buf[sample] = random.nextFloat() * levelScale - currentLevel;
+            //for (auto sample = 0; sample < buffer.getNumSamples(); ++sample)
+            //buf[sample] = random.nextFloat() * 0.25f - 0.125f;
+            //buf[sample] = random.nextFloat() * levelScale - currentLevel;
         }
     }
 

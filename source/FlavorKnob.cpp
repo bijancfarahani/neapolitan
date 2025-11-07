@@ -5,9 +5,10 @@ namespace neapolitan{
     {
         // --- Gain Slider ---
         gainSlider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
-        gainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 50, 20);
+        gainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, getWidth(), getHeight() * 0.2);
         gainSlider.setColour (juce::Slider::thumbColourId, juce::Colours::blue);
         gainSlider.setColour (juce::Slider::rotarySliderFillColourId, juce::Colours::brown);
+
         // BIJAN: How to move it in GUI?
         //.setText("TESTING", juce::dontSendNotification);
         //  gainLabel.setJustificationType(juce::Justification::centred);
@@ -40,7 +41,8 @@ namespace neapolitan{
     }
     void FlavorKnob::resized()
     {
-        gainSlider.setBounds (getWidth() * 0.5, getHeight() * 0.5, 100, 100);
+        auto childBounds = juce::Rectangle<int> (getWidth(), getHeight());
+        gainSlider.setBounds (childBounds);
     }
 
     VanillaKnob::VanillaKnob (PluginProcessor& p) : FlavorKnob (p, getFlavorName(), *(p._pluginParameters[0]))
