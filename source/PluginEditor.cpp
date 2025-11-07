@@ -49,8 +49,9 @@ void PluginEditor::paint (juce::Graphics& g)
                      + " running in " + CMAKE_BUILD_TYPE;
    g.drawText (helloWorld, area.removeFromTop (150), juce::Justification::centred, false);
    g.setColour (juce::Colours::black);
-   g.fillRect (visualizer);
-   g.drawRect (visualizer);
+   // g.fillRect (visualizer);
+   // g.drawRect (visualizer);
+   drawFrame (g);
 }
 
 void PluginEditor::resized()
@@ -63,7 +64,7 @@ void PluginEditor::resized()
    int width = area.getWidth() * 0.5;
    int y_start = area.getHeight() * 0.15;
    int height = area.getHeight() * 0.55;
-   visualizer.setBounds (x_start, y_start, width, height);
+   //_frequencyVisualizer.setBounds (x_start, y_start, width, height);
 
    auto childBounds = juce::Rectangle<int> (getWidth() * 0.30, getHeight() * 0.20)
                           .withCentre (area.getCentre())
@@ -74,9 +75,69 @@ void PluginEditor::resized()
    footer.setBounds (area.removeFromBottom (headerFooterHeight));
 }
 
+void PluginEditor::drawNextFrameOfSpectrum()
+{
+   // first apply a windowing function to our data
+   processorRef.window.multiplyWithWindowingTable (
+       processorRef.fftData, processorRef.fftSize
+   ); // [1]
+
+   // then render our FFT data..
+   processorRef.forwardFFT.performFrequencyOnlyForwardTransform (processorRef.fftData); // [2]
+
+   auto mindB = -100.0f;
+   auto maxdB = 0.0f;
+
+   for (int i = 0; i < processorRef.scopeSize; ++i) // [3]
+   {
+      auto skewedProportionX =
+          1.0f - std::exp (std::log (1.0f - (float) i / (float) processorRef.scopeSize) * 0.2f);
+      auto fftDataIndex = juce::jlimit (
+          0,
+          processorRef.fftSize / 2,
+          (int) (skewedProportionX * (float) processorRef.fftSize * 0.5f)
+      );
+      auto level = juce::jmap (
+          juce::jlimit (
+              mindB,
+              maxdB,
+              juce::Decibels::gainToDecibels (processorRef.fftData[fftDataIndex])
+                  - juce::Decibels::gainToDecibels ((float) processorRef.fftSize)
+          ),
+          mindB,
+          maxdB,
+          0.0f,
+          1.0f
+      );
+
+      processorRef.scopeData[i] = level; // [4]
+   }
+}
+
+void PluginEditor::drawFrame (juce::Graphics& g)
+{
+   for (int i = 1; i < processorRef.scopeSize; ++i)
+   {
+      auto width = getLocalBounds().getWidth();
+      auto height = getLocalBounds().getHeight();
+
+      g.drawLine (
+          {(float) juce::jmap (i - 1, 0, processorRef.scopeSize - 1, 0, width),
+           juce::jmap (processorRef.scopeData[i - 1], 0.0f, 1.0f, (float) height, 0.0f),
+           (float) juce::jmap (i, 0, processorRef.scopeSize - 1, 0, width),
+           juce::jmap (processorRef.scopeData[i], 0.0f, 1.0f, (float) height, 0.0f)}
+      );
+   }
+}
+
 void PluginEditor::timerCallback()
 {
    // Here you can repaint or update animated components
+   if (processorRef.nextFFTBlockReady)
+   {
+      drawNextFrameOfSpectrum();
+      processorRef.nextFFTBlockReady = false;
+   }
    repaint();
 }
 } // namespace neapolitan

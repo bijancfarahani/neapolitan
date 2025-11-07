@@ -45,7 +45,9 @@ PluginProcessor::PluginProcessor()
                0.3f
            )}
       ),
-      _pluginParameters()
+      _pluginParameters(),
+      forwardFFT (fftOrder),
+      window (fftSize, juce::dsp::WindowingFunction<float>::hann)
 {
    _pluginParameters[0] = apvts.getParameter (("gain_vanilla"));
    _pluginParameters[1] = apvts.getParameter (("gain_strawberry"));
@@ -186,10 +188,34 @@ void PluginProcessor::processBlock (
 
       auto* buf = buffer.getWritePointer (channel);
       // Fill the required number of samples with noise between -0.125 and +0.125
-      //for (auto sample = 0; sample < buffer.getNumSamples(); ++sample)
+      for (auto sample = 0; sample < buffer.getNumSamples(); ++sample)
+      {
+         auto data = random.nextFloat() * 0.25f - 0.125f;
+         //_frequencyVisualizer.pushNextSampleIntoFifo (data);
+         pushNextSampleIntoFifo (data);
+      }
       //buf[sample] = random.nextFloat() * 0.25f - 0.125f;
       //buf[sample] = random.nextFloat() * levelScale - currentLevel;
    }
+}
+
+void PluginProcessor::pushNextSampleIntoFifo (float sample) noexcept
+{
+   // if the fifo contains enough data, set a flag to say
+   // that the next frame should now be rendered..
+   if (fifoIndex == fftSize) // [11]
+   {
+      if (!nextFFTBlockReady) // [12]
+      {
+         juce::zeromem (fftData, sizeof (fftData));
+         memcpy (fftData, fifo, sizeof (fifo));
+         nextFFTBlockReady = true;
+      }
+
+      fifoIndex = 0;
+   }
+
+   fifo[fifoIndex++] = sample; // [12]
 }
 
 //==============================================================================

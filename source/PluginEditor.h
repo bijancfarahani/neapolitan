@@ -2,8 +2,10 @@
 
 #include "BinaryData.h"
 #include "FlavorPanel.h"
+#include "FrequencyVisualizer.h"
 #include "PluginProcessor.h"
 #include "melatonin_inspector/melatonin_inspector.h"
+
 namespace neapolitan
 {
 //==============================================================================
@@ -16,7 +18,8 @@ class PluginEditor : public juce::AudioProcessorEditor, private juce::Timer
    //==============================================================================
    void paint (juce::Graphics&) override;
    void resized() override;
-
+   void drawFrame (juce::Graphics& g);
+   void drawNextFrameOfSpectrum();
    void timerCallback() override;
 
    private:
@@ -31,6 +34,7 @@ class PluginEditor : public juce::AudioProcessorEditor, private juce::Timer
 
    juce::TextButton     footer;
    juce::Rectangle<int> visualizer;
+   //FrequencyVisualizer  _frequencyVisualizer;
 
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };
