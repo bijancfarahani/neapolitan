@@ -10,7 +10,7 @@ TEST_CASE ("one is equal to one", "[dummy]")
 
 TEST_CASE ("Plugin instance", "[instance]")
 {
-    PluginProcessor testPlugin;
+    neapolitan::PluginProcessor testPlugin;
 
     SECTION ("name")
     {
@@ -18,13 +18,3 @@ TEST_CASE ("Plugin instance", "[instance]")
             Catch::Matchers::Equals ("Pamplejuce Demo"));
     }
 }
-
-
-#ifdef PAMPLEJUCE_IPP
-    #include <ipp.h>
-
-TEST_CASE ("IPP version", "[ipp]")
-{
-    CHECK_THAT (ippsGetLibVersion()->Version, Catch::Matchers::Equals ("2022.2.0 (r0x42db1a66)"));
-}
-#endif
