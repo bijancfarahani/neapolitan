@@ -2,9 +2,6 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#if (MSVC)
-#include "ipps.h"
-#endif
 namespace neapolitan
 {
 class PluginProcessor : public juce::AudioProcessor
@@ -41,7 +38,7 @@ class PluginProcessor : public juce::AudioProcessor
 
     // Parameter handling
     juce::AudioProcessorValueTreeState apvts;
-    std::array<juce::RangedAudioParameter*, 1>
+    std::array<juce::RangedAudioParameter*, 3>
         _pluginParameters;
 
    private:
