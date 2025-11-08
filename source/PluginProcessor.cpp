@@ -45,9 +45,7 @@ PluginProcessor::PluginProcessor()
                0.3f
            )}
       ),
-      _pluginParameters(),
-      forwardFFT (fftOrder),
-      window (fftSize, juce::dsp::WindowingFunction<float>::hann)
+      _pluginParameters()
 {
    _pluginParameters[0] = apvts.getParameter (("gain_vanilla"));
    _pluginParameters[1] = apvts.getParameter (("gain_strawberry"));
@@ -191,11 +189,23 @@ void PluginProcessor::processBlock (
       for (auto sample = 0; sample < buffer.getNumSamples(); ++sample)
       {
          // This data is white noise.
-         auto data = random.nextFloat() * 0.25f - 0.125f;
+         int i = 0;
          for (auto& flavorBuffer : _flavorsFftData)
          {
+            float data = 0;
+            if (i == 0)
+               data = random.nextFloat() * 0.25f - 0.125f;
+            else if (i == 1)
+            {
+               data = 0; // pink noise
+            }
+            else
+            {
+               // brown noise
+               data = random.nextFloat() * 2.0f - 1.0f;
+            }
             pushNextSampleIntoFifo (flavorBuffer, data);
-            break;
+            ++i;
          }
       }
    }

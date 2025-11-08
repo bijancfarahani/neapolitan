@@ -15,6 +15,9 @@ enum {
 };
 struct FftData
 {
+   juce::dsp::FFT                      forwardFFT; // [4]
+   juce::dsp::WindowingFunction<float> window; // [5]
+   FftData() : forwardFFT (fftOrder), window (fftSize, juce::dsp::WindowingFunction<float>::hann) {}
    float fifo[fftSize]; // [6]
    float fftData[2 * fftSize]; // [7]
    int   fifoIndex = 0; // [8]
@@ -57,8 +60,6 @@ class PluginProcessor : public juce::AudioProcessor
    juce::AudioProcessorValueTreeState         apvts;
    std::array<juce::RangedAudioParameter*, 3> _pluginParameters;
    void pushNextSampleIntoFifo (FftData& flavorData, float sample) noexcept;
-   juce::dsp::FFT                             forwardFFT; // [4]
-   juce::dsp::WindowingFunction<float>        window; // [5]
 
    std::span<FftData, 3> getFlavorNoiseData() { return _flavorsFftData; }
 

@@ -2,10 +2,7 @@
 namespace neapolitan
 {
 PluginEditor::PluginEditor (PluginProcessor& p)
-    : AudioProcessorEditor (&p),
-      processorRef (p),
-      flavorPanel (p),
-      _frequencyVisualizer (p, juce::Colour::fromRGB (200, 200, 200))
+    : AudioProcessorEditor (&p), processorRef (p), flavorPanel (p), _frequencyVisualizer (p)
 {
    juce::ignoreUnused (processorRef);
 

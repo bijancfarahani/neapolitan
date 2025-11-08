@@ -12,21 +12,21 @@ class PluginProcessor;
 class FrequencyVisualizer : public juce::Component, private juce::Timer
 {
    public:
-   explicit FrequencyVisualizer (PluginProcessor& p, juce::Colour lineColor);
-   ~FrequencyVisualizer() override;
+       explicit FrequencyVisualizer (PluginProcessor& p);
+       ~FrequencyVisualizer() override;
 
-   void drawFrame (juce::Graphics& g);
+       void drawFrame (juce::Graphics& g);
 
-   void paint (juce::Graphics& g) override;
+       void paint (juce::Graphics& g) override;
 
-   void resized() override;
+       void resized() override;
 
-   void drawNextFrameOfSpectrum();
-   void timerCallback() override;
+       void drawNextFrameOfSpectrum();
+       void timerCallback() override;
 
    private:
    PluginProcessor& processorRef;
-   juce::Colour     _lineColor;
+   std::array<juce::Colour, 3> _lineColors;
 };
 
 } // namespace neapolitan

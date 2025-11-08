@@ -2,8 +2,13 @@
 #include "PluginProcessor.h"
 namespace neapolitan
 {
-FrequencyVisualizer::FrequencyVisualizer (PluginProcessor& p, juce::Colour lineColor)
-    : processorRef (p), _lineColor (lineColor)
+FrequencyVisualizer::FrequencyVisualizer (PluginProcessor& p)
+    : processorRef (p),
+      _lineColors {
+          juce::Colour::fromRGB (200, 200, 200),
+          juce::Colour::fromRGB (255, 150, 80),
+          juce::Colour::fromRGB (194, 145, 111)
+      }
 {
    startTimerHz (60);
 }
@@ -16,15 +21,15 @@ void FrequencyVisualizer::drawFrame (juce::Graphics& g)
    auto height = getLocalBounds().getHeight();
    for (int i = 0; i < 3; i++)
    {
-      g.setColour (_lineColor);
+      g.setColour (_lineColors[i]);
       const auto& flavorNoiseData = processorRef.getFlavorNoiseData()[i];
       for (int i = 1; i < scopeSize; ++i)
       {
          g.drawLine (
              {(float) juce::jmap (i - 1, 0, scopeSize - 1, 0, width),
-              juce::jmap (flavorNoiseData.scopeData[i - 1], 0.0f, 1.0f, (float) height, 0.0f),
+              juce::jmap (flavorNoiseData.scopeData[i - 1], 0.0f, 1.0f, (float) (height), 0.0f),
               (float) juce::jmap (i, 0, scopeSize - 1, 0, width),
-              juce::jmap (flavorNoiseData.scopeData[i], 0.0f, 1.0f, (float) height, 0.0f)}
+              juce::jmap (flavorNoiseData.scopeData[i], 0.0f, 1.0f, (float) (height), 0.0f)}
          );
       }
    }
@@ -44,10 +49,12 @@ void FrequencyVisualizer::drawNextFrameOfSpectrum()
    for (auto& flavorNoiseData : processorRef.getFlavorNoiseData())
    {
       // first apply a windowing function to our data
-      processorRef.window.multiplyWithWindowingTable (flavorNoiseData.fftData, fftSize); // [1]
+      flavorNoiseData.window.multiplyWithWindowingTable (flavorNoiseData.fftData, fftSize); // [1]
 
       // then render our FFT data..
-      processorRef.forwardFFT.performFrequencyOnlyForwardTransform (flavorNoiseData.fftData); // [2]
+      flavorNoiseData.forwardFFT.performFrequencyOnlyForwardTransform (
+          flavorNoiseData.fftData
+      ); // [2]
 
       auto mindB = -100.0f;
       auto maxdB = 0.0f;
