@@ -191,6 +191,7 @@ void PluginProcessor::processBlock (
       {
          // This data is white noise.
          int i = 0;
+         buf[sample] = 0;
          for (auto& flavorBuffer : _flavorsFftData)
          {
             auto  currentLevel = _pluginParameters[i]->getValue();
@@ -213,6 +214,7 @@ void PluginProcessor::processBlock (
             }
 
             pushNextSampleIntoFifo (flavorBuffer, data);
+            buf[sample] += data;
             ++i;
          }
       }
