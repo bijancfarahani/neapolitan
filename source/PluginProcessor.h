@@ -2,9 +2,25 @@
 
 #include "juce_dsp/juce_dsp.h"
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <span>
 
 namespace neapolitan
 {
+// Encapsulates intermidate variables for analyzing each
+// noise generator output.
+enum {
+   fftOrder = 11, // [1]
+   fftSize = 1 << fftOrder, // [2]
+   scopeSize = 512 // [3]
+};
+struct FftData
+{
+   float fifo[fftSize]; // [6]
+   float fftData[2 * fftSize]; // [7]
+   int   fifoIndex = 0; // [8]
+   bool  nextFFTBlockReady = false; // [9]
+   float scopeData[scopeSize]; // [10]
+};
 class PluginProcessor : public juce::AudioProcessor
 {
    public:
@@ -40,24 +56,18 @@ class PluginProcessor : public juce::AudioProcessor
    // Parameter handling
    juce::AudioProcessorValueTreeState         apvts;
    std::array<juce::RangedAudioParameter*, 3> _pluginParameters;
-   void                                       pushNextSampleIntoFifo (float sample) noexcept;
+   void pushNextSampleIntoFifo (FftData& flavorData, float sample) noexcept;
    juce::dsp::FFT                             forwardFFT; // [4]
    juce::dsp::WindowingFunction<float>        window; // [5]
 
-   enum {
-      fftOrder = 11, // [1]
-      fftSize = 1 << fftOrder, // [2]
-      scopeSize = 512 // [3]
-   };
+   std::span<FftData, 3> getFlavorNoiseData() { return _flavorsFftData; }
 
-   float fifo[fftSize]; // [6]
-   float fftData[2 * fftSize]; // [7]
-   int   fifoIndex = 0; // [8]
-   bool  nextFFTBlockReady = false; // [9]
-   float scopeData[scopeSize]; // [10]
    private:
-   juce::Random random;
+       void pushNextSampleIntoFifo (FftData& flavorData, int sample) noexcept;
 
-   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
+       juce::Random           random;
+       std::array<FftData, 3> _flavorsFftData;
+
+       JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };
 } // namespace neapolitan

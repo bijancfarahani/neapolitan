@@ -12,15 +12,14 @@ namespace neapolitan
 class PluginEditor : public juce::AudioProcessorEditor, private juce::Timer
 {
    public:
-   explicit PluginEditor (PluginProcessor&);
-   ~PluginEditor() override;
+       explicit PluginEditor (PluginProcessor& pluginProcessor);
+       ~PluginEditor() override;
 
-   //==============================================================================
-   void paint (juce::Graphics&) override;
-   void resized() override;
-   void drawFrame (juce::Graphics& g);
-   void drawNextFrameOfSpectrum();
-   void timerCallback() override;
+       //==============================================================================
+       void paint (juce::Graphics&) override;
+       void resized() override;
+
+       void timerCallback() override;
 
    private:
    // This reference is provided as a quick way for your editor to
@@ -34,7 +33,7 @@ class PluginEditor : public juce::AudioProcessorEditor, private juce::Timer
 
    juce::TextButton     footer;
    juce::Rectangle<int> visualizer;
-   //FrequencyVisualizer  _frequencyVisualizer;
+   FrequencyVisualizer  _frequencyVisualizer;
 
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

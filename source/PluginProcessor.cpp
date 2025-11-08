@@ -190,32 +190,15 @@ void PluginProcessor::processBlock (
       // Fill the required number of samples with noise between -0.125 and +0.125
       for (auto sample = 0; sample < buffer.getNumSamples(); ++sample)
       {
+         // This data is white noise.
          auto data = random.nextFloat() * 0.25f - 0.125f;
-         //_frequencyVisualizer.pushNextSampleIntoFifo (data);
-         pushNextSampleIntoFifo (data);
+         for (auto& flavorBuffer : _flavorsFftData)
+         {
+            pushNextSampleIntoFifo (flavorBuffer, data);
+            break;
+         }
       }
-      //buf[sample] = random.nextFloat() * 0.25f - 0.125f;
-      //buf[sample] = random.nextFloat() * levelScale - currentLevel;
    }
-}
-
-void PluginProcessor::pushNextSampleIntoFifo (float sample) noexcept
-{
-   // if the fifo contains enough data, set a flag to say
-   // that the next frame should now be rendered..
-   if (fifoIndex == fftSize) // [11]
-   {
-      if (!nextFFTBlockReady) // [12]
-      {
-         juce::zeromem (fftData, sizeof (fftData));
-         memcpy (fftData, fifo, sizeof (fifo));
-         nextFFTBlockReady = true;
-      }
-
-      fifoIndex = 0;
-   }
-
-   fifo[fifoIndex++] = sample; // [12]
 }
 
 //==============================================================================
@@ -239,6 +222,24 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
    juce::ignoreUnused (data, sizeInBytes);
 }
 
+void PluginProcessor::pushNextSampleIntoFifo (FftData& flavorData, float sample) noexcept
+{
+   // if the fifo contains enough data, set a flag to say
+   // that the next frame should now be rendered..
+   if (flavorData.fifoIndex == fftSize) // [11]
+   {
+      if (!flavorData.nextFFTBlockReady) // [12]
+      {
+         juce::zeromem (flavorData.fftData, sizeof (flavorData.fftData));
+         memcpy (flavorData.fftData, flavorData.fifo, sizeof (flavorData.fifo));
+         flavorData.nextFFTBlockReady = true;
+      }
+
+      flavorData.fifoIndex = 0;
+   }
+
+   flavorData.fifo[flavorData.fifoIndex++] = sample; // [12]
+}
 //==============================================================================
 
 } // namespace neapolitan
