@@ -185,6 +185,7 @@ void PluginProcessor::processBlock (
       // ..do something to the data...
 
       auto* buf = buffer.getWritePointer (channel);
+
       // Fill the required number of samples with noise between -0.125 and +0.125
       for (auto sample = 0; sample < buffer.getNumSamples(); ++sample)
       {
@@ -192,9 +193,14 @@ void PluginProcessor::processBlock (
          int i = 0;
          for (auto& flavorBuffer : _flavorsFftData)
          {
+            auto  currentLevel = _pluginParameters[i]->getValue();
+            auto  levelScale = currentLevel * 2.0f;
             float data = 0;
             if (i == 0)
+            {
                data = random.nextFloat() * 0.25f - 0.125f;
+               data = data * levelScale - currentLevel;
+            }
             else if (i == 1)
             {
                data = 0; // pink noise
@@ -203,7 +209,9 @@ void PluginProcessor::processBlock (
             {
                // brown noise
                data = random.nextFloat() * 2.0f - 1.0f;
+               data = data * levelScale - currentLevel;
             }
+
             pushNextSampleIntoFifo (flavorBuffer, data);
             ++i;
          }
