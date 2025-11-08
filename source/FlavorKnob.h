@@ -21,8 +21,8 @@ class FlavorKnob : public juce::Component
    protected:
    virtual juce::Colour getBackgroundColor() const = 0;
    virtual juce::String getFlavorName() const = 0;
+   juce::Slider         gainSlider;
    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainAttachment;
-   juce::Slider                                                          gainSlider;
 
    private:
    PluginProcessor& _processor;
