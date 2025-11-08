@@ -3,11 +3,11 @@
 //
 
 #pragma once
+#include "PluginProcessor.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 
 namespace neapolitan
 {
-class PluginProcessor;
 
 class FrequencyVisualizer : public juce::Component, private juce::Timer
 {
@@ -21,7 +21,7 @@ class FrequencyVisualizer : public juce::Component, private juce::Timer
 
        void resized() override;
 
-       void drawNextFrameOfSpectrum();
+       void drawNextFrameOfSpectrum (FftData& flavorNoiseData);
        void timerCallback() override;
 
    private:
